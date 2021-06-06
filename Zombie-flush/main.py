@@ -88,6 +88,7 @@ forma_de_bala                                                        = '💥'
 forma_de_enemigo_eliminado                                           = '🩸'
 forma_de_paquete_de_municion                                         = '🎁'
 forma_neutro                                                         =  '😐'
+forma_de_ataque_para_sin_balas                                       = '👊'
 formas_de_disparo                                                    = {
                                                                 'derecha'   :'👉',
                                                                 'izquierda' :'👈',
@@ -292,6 +293,8 @@ class personaje:
         elif tipo_de_enemigo == 'mayor':
             enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_a_eliminar] = list(enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_a_eliminar])
             enemigos_1.cantidad_de_enemigos_eliminados += puntuacion_para_eliminacion_de_enemigo_mayor/100
+    def efecto_golpe(self):
+        reproducir_efecto(9)
     def comprobar_blancos_acertados(self,   
                                     enemigos_1             : enemigos,   
                                     bala_1                 : bala,   
@@ -301,15 +304,13 @@ class personaje:
         lo elimina en caso de haber acertado
         """
         if (enemigos_1.cantidad_de_enemigos() > 0)  :
-            lista_de_ordenadas_de_enemigos         = [i[1] for i in enemigos_1.diccionario_de_posiciones_enemigos['normales']]
-            lista_de_ordenadas_de_enemigos_mayores = [i[1] for i in enemigos_1.diccionario_de_posiciones_enemigos['mayores']]
-            lista_de_abscisas_de_enemigos          = [i[0] for i in enemigos_1.diccionario_de_posiciones_enemigos['normales']]
-            lista_de_abscisas_de_enemigos_mayores  = [i[0] for i in enemigos_1.diccionario_de_posiciones_enemigos['mayores']]
             blanco_acertado                        = None
             enemigo_mayor_acertado                 = False
             enemigo_normal_acertado                = False
             # si disparamos hacia los laterales comprobamos si hay un enemigo en un rango cercano 
             if   orientacion_de_disparo == 'derecha' or orientacion_de_disparo == 'izquierda':
+                lista_de_ordenadas_de_enemigos         = [i[1] for i in enemigos_1.diccionario_de_posiciones_enemigos['normales']]
+                lista_de_ordenadas_de_enemigos_mayores = [i[1] for i in enemigos_1.diccionario_de_posiciones_enemigos['mayores']]
                 for y in range(self.y-2, self.y+3):
                     if (y in lista_de_ordenadas_de_enemigos) or (y in lista_de_ordenadas_de_enemigos_mayores):
                         if y in lista_de_ordenadas_de_enemigos:
@@ -320,12 +321,20 @@ class personaje:
                             enemigo_mayor_acertado = True
                             indice_de_enemigo_coincidente = lista_de_ordenadas_de_enemigos_mayores.index(y)
                             abscisa_de_enemigo = enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_coincidente][0]
-                        if (orientacion_de_disparo == 'derecha' and abscisa_de_enemigo > self.x) or (orientacion_de_disparo == 'izquierda' and abscisa_de_enemigo < self.x) :
-                            blanco_acertado = True
+                        if bala_1.cantidad_de_balas > 0:
+                            if (orientacion_de_disparo == 'derecha' and abscisa_de_enemigo >= self.x) or (orientacion_de_disparo == 'izquierda' and abscisa_de_enemigo <= self.x) :
+                                blanco_acertado = True
+                            else:
+                                blanco_acertado = False
                         else:
-                            blanco_acertado = False
+                            if (orientacion_de_disparo == 'derecha' and self.x <= abscisa_de_enemigo <= self.x+5) or (orientacion_de_disparo == 'izquierda' and self.x - 5 <= abscisa_de_enemigo <= self.x):
+                                blanco_acertado = True
+                            else:
+                                blanco_acertado = False
                         break
             elif orientacion_de_disparo == 'arriba' or orientacion_de_disparo == 'abajo':
+                lista_de_abscisas_de_enemigos          = [i[0] for i in enemigos_1.diccionario_de_posiciones_enemigos['normales']]
+                lista_de_abscisas_de_enemigos_mayores  = [i[0] for i in enemigos_1.diccionario_de_posiciones_enemigos['mayores']]
                 for x in range(self.x-3, self.x+4):
                     if (x in lista_de_abscisas_de_enemigos) or (x in lista_de_abscisas_de_enemigos_mayores):
                         if x in lista_de_abscisas_de_enemigos:
@@ -336,10 +345,16 @@ class personaje:
                             enemigo_mayor_acertado = True
                             indice_de_enemigo_coincidente = lista_de_abscisas_de_enemigos_mayores.index(x)
                             ordenada_de_enemigo = enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_coincidente][1]
-                        if (orientacion_de_disparo == 'arriba' and ordenada_de_enemigo < self.y) or (orientacion_de_disparo == 'abajo'  and ordenada_de_enemigo > self.y) :
-                            blanco_acertado = True
+                        if bala_1.cantidad_de_balas > 0 :
+                            if (orientacion_de_disparo == 'arriba' and ordenada_de_enemigo < self.y) or (orientacion_de_disparo == 'abajo'  and ordenada_de_enemigo > self.y) :
+                                blanco_acertado = True
+                            else:
+                                blanco_acertado = False
                         else:
-                            blanco_acertado = False
+                            if (orientacion_de_disparo == 'arriba' and self.y-3 <= ordenada_de_enemigo <= self.y) or orientacion_de_disparo == 'izquierda' and self.y <= abscisa_de_enemigo <= self.y+3:
+                                blanco_acertado = True
+                            else:
+                                blanco_acertado = False
                         break
             if blanco_acertado:
                 suma_de_puntuacion = None
@@ -363,36 +378,43 @@ class personaje:
         Define la posicion de la bala 
         y la forma del personaje dependiendo 
         de la orientacion del disparo
+
+        Nota: recoradar que en caso de que el jugador dispare sin balas,
+        accionara el golp. Para ello simplemente dejamos de restar balas y
+        eliminamos la posicion de la bala, de resto todo es igual. En la impresion
+        simplemente ponemos la forma de ataque sin balas en caso de que no hayan balas
         """
+        self.orientacion_de_disparo = orientacion
         if bala_1.cantidad_de_balas == 0:
-            pass
+            self.efecto_golpe()
         else:
             if not tutorial_activo:
                 bala_1.cantidad_de_balas-=1
             self.efecto_disparo()
-            self.orientacion_de_disparo = orientacion
-            if   orientacion == 'derecha':
-                if self.x+1 >= limite_x:
-                    self.x -= 3
-                self.posicion_de_arma = (self.x+1, self.y)
-                bala_1.posicion_actual = (limite_x , self.y)
-            elif orientacion  == 'izquierda':
-                if self.x - 1 <= 0:
-                    self.x += 3
-                self.posicion_de_arma = (self.x - 1, self.y)
-                bala_1.posicion_actual = (0, self.y)
-            elif orientacion == 'arriba':
-                if self.y - 1 <= 0:
-                    self.y += 3
-                self.posicion_de_arma = (self.x, self.y-1)
-                bala_1.posicion_actual  = (self.x, 0)
-            elif orientacion == 'abajo':
-                if self.y +1 >= limite_y:
-                    self.y -= 3
-                self.posicion_de_arma = self.x,self.y + 1
-                bala_1.posicion_actual = (self.x, limite_y)
-            if enemigos_habilitados:
-                self.comprobar_blancos_acertados(enemigos_1 = enemigos_1, bala_1 = bala_1, orientacion_de_disparo = orientacion)
+        if   orientacion == 'derecha':
+            if self.x+1 >= limite_x:
+                self.x -= 3
+            self.posicion_de_arma = (self.x+1, self.y)
+            bala_1.posicion_actual = (limite_x , self.y)
+        elif orientacion  == 'izquierda':
+            if self.x - 1 <= 0:
+                self.x += 3
+            self.posicion_de_arma = (self.x - 1, self.y)
+            bala_1.posicion_actual = (0, self.y)
+        elif orientacion == 'arriba':
+            if self.y - 1 <= 0:
+                self.y += 3
+            self.posicion_de_arma = (self.x, self.y-1)
+            bala_1.posicion_actual  = (self.x, 0)
+        elif orientacion == 'abajo':
+            if self.y +1 >= limite_y:
+                self.y -= 3
+            self.posicion_de_arma = self.x,self.y + 1
+            bala_1.posicion_actual = (self.x, limite_y)
+        if bala_1.cantidad_de_balas == 0:
+            bala_1.posicion_actual = (None,None)
+        if enemigos_habilitados:
+            self.comprobar_blancos_acertados(enemigos_1 = enemigos_1, bala_1 = bala_1, orientacion_de_disparo = orientacion)
     def mover(  self, 
                 orientacion : str,
                 cantidad    = None) -> None: 
@@ -654,14 +676,10 @@ def comprobar_superposicion(personaje_1                     : personaje,
                 break
     # No comprobamos superposicion con balas ya que es imposible que se superponga con algo
     # comprobamos superposicion con enemigos de todo tipo
-    if enemigos_habilitados and enemigos_1.cantidad_de_enemigos() > 0:
-        while True:
-            if personaje_1.posicion_actual in lista_de_posiciones_de_enemigos :
-                personaje_1.mover(cantidad = 1, orientacion = orientacion_de_disparo)
-                if personaje_1.esta_disparando:
-                    personaje_1.disparar(orientacion = orientacion_de_disparo, bala_1 = bala_1, enemigos_1 = enemigos_1)
-            else:
-                break
+    if enemigos_habilitados and enemigos_1.cantidad_de_enemigos() > 0 and personaje_1.posicion_actual in lista_de_posiciones_de_enemigos:
+        personaje_1.mover(cantidad = 1, orientacion = orientacion_de_disparo)
+        if personaje_1.esta_disparando:
+            personaje_1.disparar(orientacion = orientacion_de_disparo, bala_1 = bala_1, enemigos_1 = enemigos_1)
 def imprimir(personaje_1: personaje, 
             bala_1      : bala, 
             enemigos_1  : enemigos):
@@ -684,14 +702,17 @@ def imprimir(personaje_1: personaje,
             elif (x,y) in bala_1.posiciones_de_paquetes:
                 print(bala_1.paquete_de_municiones_forma, end='')  
             elif (x,y) == personaje_1.posicion_de_arma:
-                print(formas_de_disparo[personaje_1.orientacion_de_disparo], end='')
+                if bala_1.cantidad_de_balas != 0:
+                    print(formas_de_disparo[personaje_1.orientacion_de_disparo], end='')
+                else:
+                    print(forma_de_ataque_para_sin_balas, end='')
             elif (x,y) in enemigos_1.diccionario_de_posiciones_enemigos['mayores']:
                 print(enemigos_1.forma_enemigo_mayor,end = '')
             elif [x,y] in enemigos_1.diccionario_de_posiciones_enemigos['mayores']:
                 print(enemigos_1.forma_de_enemigo_mayor_eliminado, end  = '')
                 enemigos_1.diccionario_de_posiciones_enemigos['mayores'].remove([x,y])
             else:
-                print(' ', end='')
+                print(' ', end = '')
         print()
     if tutorial_activo:
         manual_de_tutorial()
@@ -737,7 +758,7 @@ def main():
             menu_de_pausa()
             # primera iteracion posterior al menu de pausa
             imprimir(personaje_1, bala_1, enemigos_1)  
-        elif (enemigos_1.cantidad_de_enemigos() > cantidad_maxima_de_enemigos) or (enemigos_1.cantidad_de_enemigos() > 0 and bala_1.cantidad_de_balas == 0 and bala_1.cantidad_de_paquetes == 0):
+        elif (enemigos_1.cantidad_de_enemigos() > cantidad_maxima_de_enemigos):
             menu_de_derrota()
             # si el jugador sale de la camara de derrota, quiere decir que quiere volver a jugar 
             personaje_1 = personaje(limite_x//2, limite_y//2)
@@ -751,7 +772,9 @@ def main():
                 continue
             else:
                 # en caso de que el jugador deje la tecla presionada para moverse, aumentamos la velocidad para optimizar
-                if tiempo_de_accion_de_tecla < 0.02:
+                if (tiempo_de_accion_de_tecla < 0.04 and tecla_de_entrada in controles_para_disparo):
+                    continue
+                elif (tiempo_de_accion_de_tecla < 0.02):
                     continue
                 else:
                     accionar_teclas(tecla_de_entrada, bala_1 = bala_1, enemigos_1 = enemigos_1, personaje_1 = personaje_1)
@@ -818,6 +841,7 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7  ,
     6 : game over
     7 : recarga
     8 : vampiro vivo
+    9 : golpe
     """
     if volumen_actual == 0:
         return None
@@ -838,6 +862,8 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7  ,
             cancion = 'efectos/recarga_de_balas.wav'
         elif cancion == 8:
             cancion = 'efectos/vampiros_1.wav'
+        elif cancion == 9:
+            cancion = 'efectos/golpe.wav'
         mixer.init()
         mixer.music.load(cancion)
         mixer.music.set_volume(volumen_actual)
@@ -854,9 +880,11 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7  ,
 
 
 
-# try:
-main()
-# except:
-#     print('Hubo un error ...')
-#     for error in errores():
-#         print(error)
+try:
+    main()
+except:
+    print('Hubo un error ...')
+    for error in errores():
+        print(error)
+finally:
+    print('Cerrando ...')

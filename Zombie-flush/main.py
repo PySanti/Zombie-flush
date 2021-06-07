@@ -1,13 +1,8 @@
 #!/usr/bin/python3
 # -*- encoding : utf-8 -*-
 
+#author: Santiago De Andrade, 06 / 06 / 2021 (i am going for you Stanford)
 
-#todo: mejorar la administracion de varios enemigos (realizacion de diccionario)
-#todo : refactorizar final, optimizar finalmente 
-#todo : limpieza de funciones
-#todo : adicion de docs y annot + hacer el codigo mas modificable 
-#todo : probar finalmente, repasar, y copiar cosas desconocidas anteriormente
-#todo : subirlo a github y hacerlo facilmente portable(agregar un tag, descargar modulos si es necesario)
 
 
 try:
@@ -75,7 +70,7 @@ cantidad_de_balas_por_paquete                                        = 15
 cantidad_maxima_de_eliminaciones_para_generacion_de_paquetes         = 20
 cantidad_maxima_de_eliminaciones_para_generacion_de_enemigos_mayores = 50
 cantidad_maxima_de_enemigos                                          = 5
-volumen_actual                                                       = 0.5
+volumen_actual                                                       = 0.7
 puntuacion_para_paso_a_segunda_ronda                                 = 999
 puntuacion_para_paso_a_tercera_ronda                                 = 5000
 caracter_de_frecuencia_para_volumen                                  = '-'
@@ -110,21 +105,20 @@ class enemigos:
     """
     Clase creada para la administracion de los enemigos
     """
-    def __init__(self,
-        contador_inicial_para_generacion_de_enemigos : int) -> None:
+    def __init__(self, contador_inicial_para_generacion_de_enemigos : int) -> None:
         self.forma_de_enemigo_normal_eliminado                                     = forma_de_enemigo_eliminado
         self.forma_de_enemigo_mayor_eliminado                                      = forma_de_enemigo_mayor_eliminado
         self.forma_de_enemigo_normal                                               = forma_de_enemigo
         self.forma_enemigo_mayor                                                   = forma_de_enemigo_mayor       
 
-        self.contador_para_generacion_de_enemigos                                 = contador_inicial_para_generacion_de_enemigos
+        self.contador_para_generacion_de_enemigos                                  = contador_inicial_para_generacion_de_enemigos
         self.click_despues_de_la_generacion_de_ultimos_enemigos                    = time() # contador incial para la generacion de enemigos normales
-        self.diccionario_de_posiciones_enemigos                                               = {
+        self.diccionario_de_posiciones_enemigos                                    = {
                                                                                 'normales'      : [],
                                                                                 'mayores'       : []
                 }
         self.cantidad_de_enemigos_eliminados                                       = 0
-        self.cantidad_de_eliminaciones_necesarias_para_generacion_de_enemigo_mayor  = randint(1,cantidad_maxima_de_eliminaciones_para_generacion_de_enemigos_mayores)
+        self.cantidad_de_eliminaciones_necesarias_para_generacion_de_enemigo_mayor = randint(1,cantidad_maxima_de_eliminaciones_para_generacion_de_enemigos_mayores)
     def es_tiempo_de_enemigos_normales(self) -> bool:
         """
         Devuelve True en caso de que se deba generar enemigos normales
@@ -141,26 +135,25 @@ class enemigos:
         Retorna True en caso de que se deban generar enemigos mayores
         """
         return (self.cantidad_de_eliminaciones_necesarias_para_generacion_de_enemigo_mayor  <= 0)
-    def efecto_zombie_normal_generado(self):
+    def efecto_zombie_normal_generado(self) -> None:
         reproducir_efecto(4)
-    def efecto_zombie_mayor_generado(self):
+    def efecto_zombie_mayor_generado(self) -> None:
         reproducir_efecto(8)
 
-    def generar_enemigo_mayor(self):
+    def generar_enemigo_mayor(self) -> None:
         '''
-        Genera un enemigo mayor 
+        Genera un enemigo mayor y lo agrega a la lista
         '''
         self.diccionario_de_posiciones_enemigos['mayores'].append((randint(1,limite_x-1), randint(1,limite_y-1)))
         self.efecto_zombie_mayor_generado()
     def generar_enemigo_normal(self) -> None:
         '''
-        Genera un enemigo normal
+        Genera un enemigo normal y lo agrega a la lista 
         '''
         self.diccionario_de_posiciones_enemigos['normales'].append((randint(1,limite_x-1), randint(1,limite_y-1)))
         self.efecto_zombie_normal_generado()
 
-    def actualizar_contador_para_generacion_de_enemigos_normales(self,
-                                                                puntuacion : int) -> None:
+    def actualizar_contador_para_generacion_de_enemigos_normales(self, puntuacion : int) -> None:
         """
         Actualiza el contador de tiempo para la generacion de 
         enemigos en funcion de la puntuacion del personaje
@@ -174,8 +167,7 @@ class enemigos:
         elif puntuacion > puntuacion_para_paso_a_tercera_ronda:
             # generacion de enemigos en tercera ronda
             self.contador_para_generacion_de_enemigos = 1
-    def actualizar_contador_para_generacion_de_enemigos_mayores(self, 
-                                                                cantidad_de_elminaciones : int):
+    def actualizar_contador_para_generacion_de_enemigos_mayores(self) -> None:
         self.cantidad_de_eliminaciones_necesarias_para_generacion_de_enemigo_mayor = randint(1,cantidad_maxima_de_eliminaciones_para_generacion_de_enemigos_mayores)
     def cantidad_de_enemigos(self) -> int:
         """
@@ -183,6 +175,8 @@ class enemigos:
         """
         # se recorre de este modo la lista por la 
         # posibilidad de encontrar a un enemigo muerto
+        # recordar lo enemigos eliminados primero se 
+        # incorporan en la lista en forma de lista 
         return len([i for i in self.diccionario_de_posiciones_enemigos['normales'] if isinstance(i, tuple)])+len([i for i in self.diccionario_de_posiciones_enemigos['mayores'] if isinstance(i, tuple)])
 class bala:
     """
@@ -197,8 +191,7 @@ class bala:
         self.cantidad_maxima_de_eliminaciones_para_generacion_de_paquetes = cantidad_maxima_de_eliminaciones_para_generacion_de_paquetes
         self.cantidad_eliminaciones_para_municion                         = randint(1,self.cantidad_maxima_de_eliminaciones_para_generacion_de_paquetes)
         self.posiciones_de_paquetes                                       = []
-    def eliminar_paquete_de_munciones(  self, 
-                                        paquete_a_eliminar : tuple) -> None:
+    def eliminar_paquete_de_munciones(  self, paquete_a_eliminar : tuple) -> None:
         """
         Recibe la posicion del paquete que se desea eliminar y lo elimina
         """
@@ -206,11 +199,14 @@ class bala:
     def redefinir_cantidad_eliminaciones_para_municion(self) -> None:
         """
         Define la cantidad de eliminaciones necesarias para la siguiente generacion
+        de municion
         """
         self.cantidad_eliminaciones_para_municion = randint(1,self.cantidad_maxima_de_eliminaciones_para_generacion_de_paquetes)
     def generar_paquete_de_municiones(self) -> None:
         """
-        Agrega un paquete nuevo a la lista de posiciones de paquetes
+        Agrega un paquete nuevo a la lista de posiciones de paquetes. Ademas
+        elimina el primer paquete de la lista en caso de que hayan mas de 3
+        una vez que se genere el ultimo
         """
         self.posiciones_de_paquetes.append(    (randint(1,limite_x), randint(1,limite_y) )   )
         if len( self.posiciones_de_paquetes) > 3:                    
@@ -222,7 +218,7 @@ class bala:
         bala para que desaparezca
         """
         self.posicion_actual = (None, None)
-    def efecto_recargar_balas(self):
+    def efecto_recargar_balas(self) -> None:
         reproducir_efecto(7)
     def recargar_balas(self) -> None:
         """
@@ -235,10 +231,7 @@ class bala:
         Retorna true en caso de que la cantidad_de_eliminaciones_para_muncion
         sea igual a 0
         """
-        if  self.cantidad_eliminaciones_para_municion <= 0:
-            return True
-        else:
-            return False
+        return self.cantidad_eliminaciones_para_municion <= 0 
     def cantidad_de_paquetes(self) -> int:
         '''
         Retorna la cantidad de paquetes 
@@ -261,9 +254,7 @@ class personaje:
     Clase creada para la 
     administracion de los personajes
     """
-    def __init__(   self, 
-                    x : int,
-                    y : int) -> None:
+    def __init__(self, x : int, y : int) -> None:
         self.pistola_arriba         = formas_de_disparo['arriba']
         self.pistola_izquierda      = formas_de_disparo['izquierda']
         self.pistola_abajo          = formas_de_disparo['abajo']
@@ -274,18 +265,13 @@ class personaje:
         self.x                      = x
         self.y                      = y 
         self.orientacion_de_disparo = None
-    def efecto_disparo(self):
+    def efecto_disparo(self) -> None:
         reproducir_efecto(2)
-    def __eliminar_enemigo( self,
-                            indice_de_enemigo_a_eliminar : int, 
-                            enemigos_1                   : enemigos,
-                            tipo_de_enemigo              : str) -> None:
+    def __eliminar_enemigo( self, indice_de_enemigo_a_eliminar : int, enemigos_1 : enemigos, tipo_de_enemigo : str) -> None:
         """
-        Recibe el indice del enemigo que se desea 
-        eliminar y lo elimina de la lista ,
-        en caso de que el tipo de enemigo sea 1,
-        se tratara de un enemigo normal, en caso contrario
-        se tratara de un enemigo mayor
+        Recibe el indice de un enemigo, y cambia su 
+        conservacion a una lista para interpretarse como
+        enemigo eliminado ulteriormente
         """
         if tipo_de_enemigo == 'normal':
             enemigos_1.diccionario_de_posiciones_enemigos['normales'][indice_de_enemigo_a_eliminar] = list(enemigos_1.diccionario_de_posiciones_enemigos['normales'][indice_de_enemigo_a_eliminar])
@@ -293,12 +279,9 @@ class personaje:
         elif tipo_de_enemigo == 'mayor':
             enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_a_eliminar] = list(enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_a_eliminar])
             enemigos_1.cantidad_de_enemigos_eliminados += puntuacion_para_eliminacion_de_enemigo_mayor/100
-    def efecto_golpe(self):
+    def efecto_golpe(self) -> None:
         reproducir_efecto(9)
-    def comprobar_blancos_acertados(self,   
-                                    enemigos_1             : enemigos,   
-                                    bala_1                 : bala,   
-                                    orientacion_de_disparo : str ):
+    def comprobar_blancos_acertados(self, enemigos_1 : enemigos, bala_1: bala, orientacion_de_disparo : str ) -> None:
         """
         Comprueba si se le acerto a algun blanco y 
         lo elimina en caso de haber acertado
@@ -338,20 +321,20 @@ class personaje:
                 for x in range(self.x-3, self.x+4):
                     if (x in lista_de_abscisas_de_enemigos) or (x in lista_de_abscisas_de_enemigos_mayores):
                         if x in lista_de_abscisas_de_enemigos:
-                            enemigo_normal_acertado = True
-                            indice_de_enemigo_coincidente = lista_de_abscisas_de_enemigos.index(x)
-                            ordenada_de_enemigo = enemigos_1.diccionario_de_posiciones_enemigos['normales'][indice_de_enemigo_coincidente][1]
+                            enemigo_normal_acertado         = True
+                            indice_de_enemigo_coincidente   = lista_de_abscisas_de_enemigos.index(x)
+                            ordenada_de_enemigo             = enemigos_1.diccionario_de_posiciones_enemigos['normales'][indice_de_enemigo_coincidente][1]
                         else:
-                            enemigo_mayor_acertado = True
+                            enemigo_mayor_acertado        = True
                             indice_de_enemigo_coincidente = lista_de_abscisas_de_enemigos_mayores.index(x)
-                            ordenada_de_enemigo = enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_coincidente][1]
+                            ordenada_de_enemigo           = enemigos_1.diccionario_de_posiciones_enemigos['mayores'][indice_de_enemigo_coincidente][1]
                         if bala_1.cantidad_de_balas > 0 :
                             if (orientacion_de_disparo == 'arriba' and ordenada_de_enemigo < self.y) or (orientacion_de_disparo == 'abajo'  and ordenada_de_enemigo > self.y) :
                                 blanco_acertado = True
                             else:
                                 blanco_acertado = False
                         else:
-                            if (orientacion_de_disparo == 'arriba' and self.y-3 <= ordenada_de_enemigo <= self.y) or orientacion_de_disparo == 'izquierda' and self.y <= abscisa_de_enemigo <= self.y+3:
+                            if (orientacion_de_disparo == 'arriba' and self.y-3 <= ordenada_de_enemigo <= self.y) or (orientacion_de_disparo == 'abajo' and self.y <= ordenada_de_enemigo <= self.y+3):
                                 blanco_acertado = True
                             else:
                                 blanco_acertado = False
@@ -370,19 +353,16 @@ class personaje:
                 if bala_1.se_requiere_generar_paquete_de_munciones():
                     bala_1.generar_paquete_de_municiones()
                     bala_1.redefinir_cantidad_eliminaciones_para_municion()
-    def disparar(   self, 
-                    orientacion : str, 
-                    bala_1      : bala, 
-                    enemigos_1  : enemigos ) -> None:
+    def disparar(self, orientacion : str, bala_1 : bala, enemigos_1  : enemigos ) -> None:
         """
         Define la posicion de la bala 
         y la forma del personaje dependiendo 
         de la orientacion del disparo
 
         Nota: recoradar que en caso de que el jugador dispare sin balas,
-        accionara el golp. Para ello simplemente dejamos de restar balas y
+        accionara el golpe. Para ello simplemente dejamos de restar balas y
         eliminamos la posicion de la bala, de resto todo es igual. En la impresion
-        simplemente ponemos la forma de ataque sin balas en caso de que no hayan balas
+        simplemente ponemos la forma_de_ataque_sin_balas en caso de que no hayan balas
         """
         self.orientacion_de_disparo = orientacion
         if bala_1.cantidad_de_balas == 0:
@@ -415,9 +395,7 @@ class personaje:
             bala_1.posicion_actual = (None,None)
         if enemigos_habilitados:
             self.comprobar_blancos_acertados(enemigos_1 = enemigos_1, bala_1 = bala_1, orientacion_de_disparo = orientacion)
-    def mover(  self, 
-                orientacion : str,
-                cantidad    = None) -> None: 
+    def mover(self, orientacion : str,cantidad = None) -> None: 
         """
         Mueve el personaje  hacia la orientacion que se le indica,
         en base a eso, determina la cantidad de veces que se mueve 
@@ -445,20 +423,18 @@ class personaje:
         """
         return self.posicion_de_arma != (None,None)
     @property
-    def posicion_actual(self):
+    def posicion_actual(self) -> tuple:
         """
-        Devuelve una tupla con la posicion del personaje en el momento
+        Devuelve una tupla con la posicion del personaje 
         """
         return (self.x, self.y)
     @posicion_actual.setter
-    def posicion_actual(self, 
-                        nueva_posicion : int):
+    def posicion_actual(self, nueva_posicion : int) -> None:
         self.x,self.y = nueva_posicion
     @posicion_actual.deleter
-    def posicion_actual(self):
+    def posicion_actual(self) -> None:
         del self.x, self.y
-    def personaje_posicionado_en_limite_y_se_quiere_mover_mas_alla_de_el(   self, 
-                                                                            tecla_de_entrada : str) -> bool:
+    def personaje_posicionado_en_limite_y_se_quiere_mover_mas_alla_de_el(self, tecla_de_entrada : str) -> bool:
         """
         Funcion creada con fines de optimizacion, retorna True si el 
         jugador se quiere mover mas alla de un limite
@@ -496,7 +472,10 @@ def manual_de_tutorial() -> None:
     for tecla,direccion in controles_para_disparo.items():
         print(f" {direccion.capitalize()} : '{tecla}' ", end=' , ')
     print(f"Pausar : '{'space' if tecla_de_pausa == ' ' else tecla_de_pausa}', Empezar : '{tecla_para_empezar_partida}'")
-def manual_de_control_de_volumen(volumen):
+def manual_de_control_de_volumen(volumen : int) -> None:
+    '''
+    Imprime el manual para la modificacion del volumen
+    '''
     salto_de_linea(4)
     for tecla, accion in controles_para_modificacion_de_volumen.items():
         salto_de_linea()
@@ -507,7 +486,10 @@ def manual_de_control_de_volumen(volumen):
     print(f'Volumen   : {volumen}')
 
 #// MENUS
-def menu_de_seleccion_de_dificultad():
+def menu_de_seleccion_de_dificultad() -> None:
+    '''
+    Menu interactivo para la seleccion de la dificultad
+    '''
     global cantidad_inicial_de_balas, cantidad_de_balas_por_paquete,cantidad_maxima_de_eliminaciones_para_generacion_de_paquetes 
     global cantidad_maxima_de_enemigos, puntuacion_para_paso_a_segunda_ronda ,puntuacion_para_paso_a_tercera_ronda     
     menu = ['Facil', 'Medio', 'Rompe culos']
@@ -527,7 +509,10 @@ def menu_de_seleccion_de_dificultad():
         puntuacion_para_paso_a_segunda_ronda                         = 1000
         puntuacion_para_paso_a_tercera_ronda                         = 2000
     reproducir_efecto(3)
-def menu_de_seleccion_de_formas():
+def menu_de_seleccion_de_formas() -> None:
+    '''
+    Menu interactivo para la seleccion de personajes
+    '''
     global forma_neutro
     lista_de_formas = {
         1  : '🕵️ ',
@@ -543,12 +528,9 @@ def menu_de_seleccion_de_formas():
     eleccion = print_menu(menu, mensaje = 'Selecciona a tu personaje ...')
     reproducir_efecto(3)
     forma_neutro = lista_de_formas[eleccion]
-def menu_de_pausa():
+def menu_de_pausa() -> None:
     '''
-    Menu de accion en caso de quue el jugador pulse la tecla de pausa ...
-
-    Nota: recibe a los elementos para el caso en 
-    el que el jugador quiera volver a empezar
+    Menu de accion en caso de que el jugador pulse la tecla de pausa ...
     '''
     while True:
         terminal('clear')
@@ -563,7 +545,11 @@ def menu_de_pausa():
         elif eleccion == 3:
             terminal('clear')
             quit()
-def menu_de_derrota():
+def menu_de_derrota() -> None:
+    '''
+    Menu interactivo para el caso de que el
+    jugador sea derrotado
+    '''
     global tutorial_activo
     terminal('clear')
     salto_de_linea(10)
@@ -584,7 +570,7 @@ def menu_de_derrota():
     else:
         terminal('clear')
         quit() 
-def menu_de_inicio():
+def menu_de_inicio() -> None:
     """
     Imprime por pantalla el menu de inicio
     """
@@ -612,7 +598,10 @@ def menu_de_inicio():
     else:
         reproducir_efecto(3)
         tutorial_activo = True if eleccion == 1 else False
-def menu_de_configuracion_de_volumen():
+def menu_de_configuracion_de_volumen() -> None:
+    '''
+    Menu creado para la configuracion del volumen 
+    '''
     global volumen_actual, caracter_de_frecuencia_para_volumen, caracter_de_frecuencia_actual
     def imprimir_calibrador_de_volumen():
         nonlocal iterador
@@ -657,32 +646,24 @@ def menu_de_configuracion_de_volumen():
 
 
 #// FUNCIONES LARGAS
-def comprobar_superposicion(personaje_1                     : personaje,
-                            bala_1                          : bala,
-                            lista_de_posiciones_de_enemigos : list,
-                            enemigos_1                      : enemigos):
-    """
-    Comprueba superposicion entre los elementos y actua en respuesta 
-    """
-    orientacion_de_movimiento = None
-    orientacion_de_disparo    = None
-    # comprobamos superposicion con paquetes
-    for y in range(personaje_1.y-3, personaje_1.y+3):
-        for x in range(personaje_1.x-3, personaje_1.x+3):
-            if (x,y) in bala_1.posiciones_de_paquetes:
-                bala_1.recargar_balas()
-                bala_1.efecto_recargar_balas()
-                bala_1.eliminar_paquete_de_munciones((x,y))
-                break
-    # No comprobamos superposicion con balas ya que es imposible que se superponga con algo
-    # comprobamos superposicion con enemigos de todo tipo
-    if enemigos_habilitados and enemigos_1.cantidad_de_enemigos() > 0 and personaje_1.posicion_actual in lista_de_posiciones_de_enemigos:
-        personaje_1.mover(cantidad = 1, orientacion = orientacion_de_disparo)
-        if personaje_1.esta_disparando:
-            personaje_1.disparar(orientacion = orientacion_de_disparo, bala_1 = bala_1, enemigos_1 = enemigos_1)
-def imprimir(personaje_1: personaje, 
-            bala_1      : bala, 
-            enemigos_1  : enemigos):
+def comprobar_superposicion(lista_de_elementos : list, lista_de_enemigos : list) -> None:
+    '''
+    Comprueba superposiciones entre elementos y enemigos
+    '''
+    enemigo_actual = None
+    cantidad_de_movimiento = None
+    for enemigo in lista_de_enemigos:
+        enemigo_actual = tuple(enemigo)
+        if enemigo_actual in lista_de_elementos:
+            if isinstance( enemigo, list):
+                if enemigo[0] + 5 >= limite_x:
+                    lista_de_elementos
+                    pass
+                    
+
+
+
+def imprimir(personaje_1: personaje, bala_1 : bala, enemigos_1 : enemigos) -> None:
     """
     Imprime los elementos en pantalla (enemigos, personajes, balas) ...
     """
@@ -693,12 +674,6 @@ def imprimir(personaje_1: personaje,
                 print(personaje_1.forma_neutro, end='')
             elif (x,y) == bala_1.posicion_actual:
                 print(bala_1.forma, end='')
-            elif (x,y) in enemigos_1.diccionario_de_posiciones_enemigos['normales']  and enemigos_habilitados:
-                print(enemigos_1.forma_de_enemigo_normal,end='')
-            # en caso de que la posicion del enemigo este en una lista, querra decir que esta eliminado
-            elif [x,y] in enemigos_1.diccionario_de_posiciones_enemigos['normales'] :
-                print(enemigos_1.forma_de_enemigo_normal_eliminado, end='')
-                enemigos_1.diccionario_de_posiciones_enemigos['normales'].remove([x,y])
             elif (x,y) in bala_1.posiciones_de_paquetes:
                 print(bala_1.paquete_de_municiones_forma, end='')  
             elif (x,y) == personaje_1.posicion_de_arma:
@@ -706,11 +681,22 @@ def imprimir(personaje_1: personaje,
                     print(formas_de_disparo[personaje_1.orientacion_de_disparo], end='')
                 else:
                     print(forma_de_ataque_para_sin_balas, end='')
+
+
+
+            elif (x,y) in enemigos_1.diccionario_de_posiciones_enemigos['normales']  and enemigos_habilitados:
+                print(enemigos_1.forma_de_enemigo_normal,end='')
+            # en caso de que la posicion del enemigo este en una lista, querra decir que esta eliminado
+            elif [x,y] in enemigos_1.diccionario_de_posiciones_enemigos['normales'] :
+                print(enemigos_1.forma_de_enemigo_normal_eliminado, end='')
+                enemigos_1.diccionario_de_posiciones_enemigos['normales'].remove([x,y])
             elif (x,y) in enemigos_1.diccionario_de_posiciones_enemigos['mayores']:
                 print(enemigos_1.forma_enemigo_mayor,end = '')
             elif [x,y] in enemigos_1.diccionario_de_posiciones_enemigos['mayores']:
                 print(enemigos_1.forma_de_enemigo_mayor_eliminado, end  = '')
                 enemigos_1.diccionario_de_posiciones_enemigos['mayores'].remove([x,y])
+
+
             else:
                 print(' ', end = '')
         print()
@@ -718,10 +704,7 @@ def imprimir(personaje_1: personaje,
         manual_de_tutorial()
     else:
         status_de_partida(personaje_1, enemigos_1, bala_1)
-def accionar_teclas(tecla_de_entrada          : str,
-                    personaje_1               : personaje,
-                    bala_1                    : bala,
-                    enemigos_1                : enemigos) -> None:
+def accionar_teclas(tecla_de_entrada: str, personaje_1: personaje, bala_1 : bala,enemigos_1 : enemigos) -> None:
     """
     Recibe la tecla pulsada y actua en respuesta
     """
@@ -739,7 +722,10 @@ def accionar_teclas(tecla_de_entrada          : str,
         reproducir_efecto(3)
         tutorial_activo = False
         enemigos_habilitados = True
-def main():
+def main() -> None:
+    '''
+    ...
+    '''
     global getch, velocidad_de_movimiento_en_ordenadas, velocidad_de_movimiento_en_abscisas
     # decoramos 'getch' para que retorne la cantidad de tiempo en intervalos de pulsaciones de teclas
     getch = contador_de_input(getch)
@@ -779,30 +765,34 @@ def main():
                 else:
                     accionar_teclas(tecla_de_entrada, bala_1 = bala_1, enemigos_1 = enemigos_1, personaje_1 = personaje_1)
                     if enemigos_habilitados:
-                         if enemigos_1.es_tiempo_de_enemigos_normales():
-                             enemigos_1.generar_enemigo_normal()
-                             enemigos_1.actualizar_contador_para_generacion_de_enemigos_normales(personaje_1.puntuacion)
-                         if enemigos_1.es_tiempo_de_enemigos_mayores():
-                             enemigos_1.generar_enemigo_mayor()
-                             enemigos_1.actualizar_contador_para_generacion_de_enemigos_mayores(enemigos_1.cantidad_de_enemigos_eliminados)
-                    comprobar_superposicion(personaje_1, bala_1, enemigos_1.diccionario_de_posiciones_enemigos['normales'] + enemigos_1.diccionario_de_posiciones_enemigos['mayores'], enemigos_1)
+                        if enemigos_1.es_tiempo_de_enemigos_normales():
+                            enemigos_1.generar_enemigo_normal()
+                            enemigos_1.actualizar_contador_para_generacion_de_enemigos_normales(personaje_1.puntuacion)
+                        if enemigos_1.es_tiempo_de_enemigos_mayores():
+                            enemigos_1.generar_enemigo_mayor()
+                            enemigos_1.actualizar_contador_para_generacion_de_enemigos_mayores()
+                    comprobar_superposicion(personaje_1, bala_1, enemigos_1)
                     imprimir(personaje_1, bala_1, enemigos_1)  
 
 #// FUNCIONES CORTAS
-def reiniciar_partida(  personaje_1: personaje,
-                        bala_1     : bala,
-                        enemigos_1 : enemigos):
+def salto_de_linea(cantidad = 1) -> None:
     '''
-    Sobreescribe los punteros de los elementos para empezar una nueva partida
+    Recibe la cantidad de saltos de linea que se desean
+    ejecutar, en caso de que no se especifique, se ejecutara
+    1 salto de linea
     '''
-
-def salto_de_linea(cantidad = 1):
     for i in range(cantidad+1):
         print()
 def tab(cantidad = 1):
+    '''
+
+    Recibe la cantidad de tabs que se desean
+    ejecutar, en caso de que no se especifique, se ejecutara
+    1 tab 
+    '''
     for i in range(cantidad+1):
         print('\t',end='')
-def contador_de_input(funcion : getch):
+def contador_de_input(funcion : getch) -> None: 
     """
     Decorador creado para calcular la cantidad 
     de tiempo que se tarda el jugador en introducir 
@@ -816,9 +806,7 @@ def contador_de_input(funcion : getch):
         entrada = funcion().lower()
         return (entrada, time()-t1)
     return wrapper
-def status_de_partida(  personaje_1 : personaje,
-                        enemigos_1 : enemigos,
-                        bala_1 : bala) -> str:
+def status_de_partida(personaje_1 : personaje, enemigos_1 : enemigos, bala_1 : bala) -> None:
     """
     Mensaje que establece el status de la partida
     """
@@ -826,13 +814,11 @@ def status_de_partida(  personaje_1 : personaje,
     print(f'{forma_de_enemigo} : {int(enemigos_1.cantidad_de_enemigos())}  ',end='\t\t')
     print(f'{forma_de_bala} : {int(bala_1.cantidad_de_balas):3} ', end='\t\t')
     print(f'{forma_de_enemigo_eliminado} : {int(enemigos_1.cantidad_de_enemigos_eliminados):3}', end='\t\t')
-    print(f'{forma_de_paquete_de_municion} : {int(bala_1.cantidad_eliminaciones_para_municion):2}',end='\t\t')
-    print(f'{forma_de_enemigo_mayor} : {int(enemigos_1.cantidad_de_eliminaciones_necesarias_para_generacion_de_enemigo_mayor)}')
-def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7  ,                        
-                    loops = None):
+    print(f'{forma_de_paquete_de_municion} : {int(bala_1.cantidad_eliminaciones_para_municion):2}')
+def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7, loops = None) -> None:
     """
-    Crea el objeto sound con la cancion cargada y lo devuelve
-
+    Ejecuta el efecto que se le indique, en caso de recibir la cantidad 
+    de loops, retorna el objeto cancion para poder detenerla
     1 : intro
     2 : disparo
     3 : seleccion
@@ -842,6 +828,9 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7  ,
     7 : recarga
     8 : vampiro vivo
     9 : golpe
+
+
+    Nota: en caso de que el volumen sea 0, no hace nada 
     """
     if volumen_actual == 0:
         return None
@@ -882,6 +871,8 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7  ,
 
 try:
     main()
+except SystemExit:
+    pass
 except:
     print('Hubo un error ...')
     for error in errores():

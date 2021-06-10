@@ -3,33 +3,25 @@
 
 #author: Santiago De Andrade, 06 / 06 / 2021 (i am going for you Stanford)
 
+# todo: terminar la comprobacion de superposicion, arreglar toma de paquetes, arreglar efecto de ultimo disparo
 
 
-try:
-    from ideas  import print_menu
-    from os     import system as terminal
-    from time   import time
-    from random import randint
+
+from sys    import exc_info as errores
+from sys    import  path
+path.clear()
+path.append('./dependencias/env/lib/python3.8/site-packages')
+path.append('./dependencias')
+from platform import sistema_operativo
+if sistema_operativo() == 'Linux':
     from getch  import getch
-    from pygame import mixer
-    from sys    import exc_info as errores
-
-except:
-    print("""
-        Hubo un error al importar dependencias ... 
-        Revise si tiene instaladas todas las dependencias necesarias :  
-        - time
-        - os
-        - random
-        - getch
-        - ideas
-        - pygame
-        - sys 
-        En caso de que requiera descargar algunos paquetes, ponga en su terminal
-        pip install <paquete>
-        """)
-    quit()
-
+elif sistema_operativo() == 'Windows':
+    pass
+from ideas  import print_menu
+from os     import system as terminal
+from time   import time
+from pygame import mixer
+from random import randint
 #!----------------------------------------------------------------------------------------------------------------------------------------------------------
 #!                                                               VARIABLES GLOBALES
 #!----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -113,10 +105,7 @@ class enemigos:
 
         self.contador_para_generacion_de_enemigos                                  = contador_inicial_para_generacion_de_enemigos
         self.click_despues_de_la_generacion_de_ultimos_enemigos                    = time() # contador incial para la generacion de enemigos normales
-        self.diccionario_de_posiciones_enemigos                                    = {
-                                                                                'normales'      : [],
-                                                                                'mayores'       : []
-                }
+        self.diccionario_de_posiciones_enemigos                                    = {'normales': [], 'mayores' : []}
         self.cantidad_de_enemigos_eliminados                                       = 0
         self.cantidad_de_eliminaciones_necesarias_para_generacion_de_enemigo_mayor = randint(1,cantidad_maxima_de_eliminaciones_para_generacion_de_enemigos_mayores)
     def es_tiempo_de_enemigos_normales(self) -> bool:
@@ -196,6 +185,20 @@ class bala:
         Recibe la posicion del paquete que se desea eliminar y lo elimina
         """
         self.posiciones_de_paquetes.remove(paquete_a_eliminar)
+    def comprobar_coincidencia_con_posicion_de_paquete(self, personaje_1) -> None:
+        '''
+        Comprueba superposiciones entre elementos y enemigos
+        '''
+        for y in range( personaje_1.y - 3, personaje_1.y + 3 ):
+            for x in range( personaje_1.x - 3, personaje_1.x + 3 ):
+                if (x,y) in self.posiciones_de_paquetes:
+                    self.eliminar_paquete_de_munciones( ( x,y ) )
+                    self.efecto_recargar_balas()
+                    self.recargar_balas()
+
+
+
+
     def redefinir_cantidad_eliminaciones_para_municion(self) -> None:
         """
         Define la cantidad de eliminaciones necesarias para la siguiente generacion
@@ -646,20 +649,6 @@ def menu_de_configuracion_de_volumen() -> None:
 
 
 #// FUNCIONES LARGAS
-def comprobar_superposicion(lista_de_elementos : list, lista_de_enemigos : list) -> None:
-    '''
-    Comprueba superposiciones entre elementos y enemigos
-    '''
-    enemigo_actual = None
-    cantidad_de_movimiento = None
-    for enemigo in lista_de_enemigos:
-        enemigo_actual = tuple(enemigo)
-        if enemigo_actual in lista_de_elementos:
-            if isinstance( enemigo, list):
-                if enemigo[0] + 5 >= limite_x:
-                    lista_de_elementos
-                    pass
-                    
 
 
 
@@ -723,9 +712,6 @@ def accionar_teclas(tecla_de_entrada: str, personaje_1: personaje, bala_1 : bala
         tutorial_activo = False
         enemigos_habilitados = True
 def main() -> None:
-    '''
-    ...
-    '''
     global getch, velocidad_de_movimiento_en_ordenadas, velocidad_de_movimiento_en_abscisas
     # decoramos 'getch' para que retorne la cantidad de tiempo en intervalos de pulsaciones de teclas
     getch = contador_de_input(getch)
@@ -735,7 +721,6 @@ def main() -> None:
     enemigos_1  = enemigos(contador_inicial_para_generacion_de_enemigos = contador_inicial_para_generacion_de_enemigos)
     # para la primera iteracion
     imprimir(personaje_1, bala_1,enemigos_1)
-
 
     while True:
         tecla_de_entrada, tiempo_de_accion_de_tecla = getch()
@@ -771,7 +756,8 @@ def main() -> None:
                         if enemigos_1.es_tiempo_de_enemigos_mayores():
                             enemigos_1.generar_enemigo_mayor()
                             enemigos_1.actualizar_contador_para_generacion_de_enemigos_mayores()
-                    comprobar_superposicion(personaje_1, bala_1, enemigos_1)
+                    if bala_1.cantidad_de_paquetes() > 0 :
+                        bala_1.comprobar_coincidencia_con_posicion_de_paquete(personaje_1)
                     imprimir(personaje_1, bala_1, enemigos_1)  
 
 #// FUNCIONES CORTAS
@@ -869,13 +855,13 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7, loops = None) -> None
 
 
 
-try:
-    main()
-except SystemExit:
-    pass
-except:
-    print('Hubo un error ...')
-    for error in errores():
-        print(error)
-finally:
-    print('Cerrando ...')
+#try:
+main()
+#except SystemExit:
+#    pass
+#except:
+#    print('Hubo un error ...')
+#    for error in errores():
+#        print(error)
+#finally:
+#    print('Cerrando ...')

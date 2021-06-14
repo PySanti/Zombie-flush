@@ -1,3 +1,6 @@
+
+
+
 def agregar_a_lista(    lista : list, 
                         elementos_y_cantidades : dict) -> list:
     """
@@ -43,16 +46,7 @@ def agregar_a_lista(    lista : list,
         return tuple(lista)
     elif tipo_de_lista_inicial == list:
         return lista
-def print_menu(  lista_a_imprimir : list, 
-                    caracter_de_seleccion = ' <', 
-                    caracter_arriba = 'w',
-                    caracter_abajo = 's' , 
-                    caracter_de_ejecucion = '\n',
-                    caracter_de_guionizacion = '~ ',
-                    indice_de_comienzo = None, 
-                    mensaje = None,
-                    color_para_linea_seleccionada = True,
-                    efecto_de_movimiento = True) -> int:
+def print_menu(  lista_a_imprimir : list, caracter_de_seleccion = ' <', caracter_arriba = 'w',caracter_abajo = 's' , caracter_de_ejecucion = '\n',caracter_de_guionizacion = '~ ', indice_de_comienzo = None, mensaje = None, color_para_linea_seleccionada = True, efecto_de_movimiento = True) -> int:
     """
     Imprime la lista que se le pase en el primer parametro en forma de menu
     permitiendo acceder a las opciones interactivamente
@@ -87,6 +81,8 @@ def print_menu(  lista_a_imprimir : list,
     try:
         from getch import getch 
         from os import system
+        from sys import path
+        path.append('.')
         caracter_de_seleccion    = caracter_de_seleccion if caracter_de_seleccion == ' <' else str(caracter_de_seleccion)
         indice_de_comienzo       = len(lista_a_imprimir)//2 if indice_de_comienzo ==  None else int(indice_de_comienzo)
         caracter_arriba          = caracter_arriba if caracter_arriba == 'w' else str(caracter_arriba)
@@ -96,12 +92,19 @@ def print_menu(  lista_a_imprimir : list,
         mensaje                  = None if mensaje == None else str(mensaje)
         lista_a_imprimir_copia   = [str(i) for i in lista_a_imprimir]
         if color_para_linea_seleccionada:
-            import colorama
-            from colorama import Back, Fore, Style
-            colorama.init()
+            try:
+                import colorama
+            except (ModuleNotFoundError, ImportError):
+                print("""
+                Hubo un error al importar el modulo " colorama " ...                             
+                """)
+                quit()
+            else:
+                from colorama import Back, Fore, Style
+                colorama.init()
         if len(lista_a_imprimir) == 0:
             raise Exception
-    except Exception:
+    except:
         print("""
             Error en la funcion ideas.imprimir_menu
             Posibles candidatos ...

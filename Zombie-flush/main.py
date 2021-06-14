@@ -12,11 +12,7 @@ from sys    import  path
 path.clear()
 path.append('./dependencias/env/lib/python3.8/site-packages')
 path.append('./dependencias')
-from platform import sistema_operativo
-if sistema_operativo() == 'Linux':
-    from getch  import getch
-elif sistema_operativo() == 'Windows':
-    pass
+from getch  import getch
 from ideas  import print_menu
 from os     import system as terminal
 from time   import time
@@ -743,9 +739,7 @@ def main() -> None:
                 continue
             else:
                 # en caso de que el jugador deje la tecla presionada para moverse, aumentamos la velocidad para optimizar
-                if (tiempo_de_accion_de_tecla < 0.04 and tecla_de_entrada in controles_para_disparo):
-                    continue
-                elif (tiempo_de_accion_de_tecla < 0.02):
+                if (tiempo_de_accion_de_tecla < 0.02) or (tiempo_de_accion_de_tecla < 0.02 and tecla_de_entrada in controles_para_disparo):
                     continue
                 else:
                     accionar_teclas(tecla_de_entrada, bala_1 = bala_1, enemigos_1 = enemigos_1, personaje_1 = personaje_1)

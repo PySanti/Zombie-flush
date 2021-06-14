@@ -849,13 +849,13 @@ def reproducir_efecto(cancion : 1 | 2 | 3 | 4 | 5 | 6 | 7, loops = None) -> None
 
 
 
-#try:
-main()
-#except SystemExit:
-#    pass
-#except:
-#    print('Hubo un error ...')
-#    for error in errores():
-#        print(error)
-#finally:
-#    print('Cerrando ...')
+try:
+    main()
+except SystemExit:
+    pass
+except:
+    print('Hubo un error ...')
+    for error in errores():
+        print(error)
+finally:
+    print('Cerrando ...')

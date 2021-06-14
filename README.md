@@ -5,3 +5,5 @@ Instalacion: ponga en su terminal  -> git clone https://github.com/PySanti/zombi
 
 
 Jugar: ponga en su terminal  -> python <ruta_de_instalacion>/main.py <-
+
+Recomendaciones: poner el juego en pantalla completa

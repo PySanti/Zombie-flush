@@ -1,23 +1,20 @@
 #!/usr/bin/python3
 # -*- encoding : utf-8 -*-
 
-#author: Santiago De Andrade, 06 / 06 / 2021 (i am going for you Stanford)
-
-# todo: terminar la comprobacion de superposicion, arreglar toma de paquetes, arreglar efecto de ultimo disparo
-
-
+#author: Santiago De Andrade, 06 / 06 / 2021 
 
 from sys    import exc_info as errores
-from sys    import  path
-path.clear()
-path.append('./dependencias/env/lib/python3.8/site-packages')
-path.append('./dependencias')
-from getch  import getch
-from ideas  import print_menu
+from sys    import path
 from os     import system as terminal
-from time   import time
-from pygame import mixer
 from random import randint
+from time   import time
+path.clear()
+path.append('dependencies/venv/lib/python3.8/site-packages/')
+path.append('dependencies/venv/include/site/python3.8')
+from ideas  import print_menu
+import colorama
+from getch  import getch
+from pygame  import mixer
 #!----------------------------------------------------------------------------------------------------------------------------------------------------------
 #!                                                               VARIABLES GLOBALES
 #!----------------------------------------------------------------------------------------------------------------------------------------------------------

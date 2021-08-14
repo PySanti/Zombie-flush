@@ -1,6 +1,10 @@
 # Zombie-flush
 A little and ugly python3 terminal game, all the code made by Santiago De Andrade 06/2021
 
+Download:
+    
+    git clone https://github.com/PySanti/Zombie-flush
+
 Usage:
 
     cd (instalation_path)

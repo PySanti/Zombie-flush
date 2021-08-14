@@ -29,6 +29,7 @@ Recomendations:
         2- Flush as much zombies as you can !
 
 Considerations:
+
         1- There can not be more than 5 zombies alive, otherwise you lose
         2- You'll have a limited bullets count, don't fail the shoot!
         3- Vampires have a value of 5 times a zombie

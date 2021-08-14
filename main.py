@@ -541,7 +541,7 @@ def menu_de_pausa() -> None:
         elif eleccion == 3:
             terminal('clear')
             quit()
-def menu_de_derrota() -> None:
+def menu_de_derrota(personaje_1 : personaje) -> None:
     '''
     Menu interactivo para el caso de que el
     jugador sea derrotado
@@ -549,8 +549,8 @@ def menu_de_derrota() -> None:
     global tutorial_activo
     terminal('clear')
     salto_de_linea(10)
-    tab(6)
-    print('👎 Has sido derrotad@, pulsa enter para continuar 👎')
+    tab(5)
+    print(f'👎 Has sido derrotad@, alcanzaste una puntuacion maxima de {personaje_1.puntuacion} puntos, pulsa enter para continuar ... 👎')
     reproducir_efecto(6)
     while True:
         tecla_entrada,_ = getch()
@@ -723,7 +723,7 @@ def main() -> None:
             # primera iteracion posterior al menu de pausa
             imprimir(personaje_1, bala_1, enemigos_1)  
         elif (enemigos_1.cantidad_de_enemigos() > cantidad_maxima_de_enemigos):
-            menu_de_derrota()
+            menu_de_derrota(personaje_1);
             # si el jugador sale de la camara de derrota, quiere decir que quiere volver a jugar 
             personaje_1 = personaje(limite_x//2, limite_y//2)
             bala_1 = bala()

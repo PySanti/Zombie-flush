@@ -9,19 +9,19 @@ Usage:
 Controls:
     
     moving :
-      right   : d
-      left    : a
-      down    : s
-      up      : w
+        right   : d
+        left    : a
+        down    : s
+        up      : w
     
     shooting
-      right : ;
-      left  : k
-      up    : o
-      down  : l
+        right : ;
+        left  : k
+        up    : o
+        down  : l
     
     others:
-      menu : 'space'
+        menu : 'space'
     
 Recomendations: 
         

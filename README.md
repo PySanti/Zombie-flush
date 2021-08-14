@@ -3,7 +3,8 @@ A little and ugly python3 terminal game, all the code made by Santiago De Andrad
 
 Usage:
 
-    ./(instalation_path)/main.py
+    cd (instalation_path)
+    ./main.py
     
 Controls:
     
@@ -11,7 +12,7 @@ Controls:
       right   : d
       left    : a
       down    : s
-      uo      : w
+      up      : w
     
     shooting
       right : ;
@@ -22,3 +23,7 @@ Controls:
     others:
       menu : 'space'
     
+Recomendations: 
+        
+        1- Press f11 to activate full screen, the game was made considering that
+        2- Flush as much zombies as you can ! 

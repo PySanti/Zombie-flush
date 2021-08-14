@@ -8,8 +8,9 @@ from sys    import path
 from os     import system as terminal
 from random import randint
 from time   import time
-path.append('dependencies/venv/lib/python3.8/site-packages/')
-path.append('dependencies/venv/include/site/python3.8')
+path.clear();
+path.append('venv/lib/python3.8/site-packages/')
+path.append('venv/include/site/python3.8')
 from ideas  import print_menu
 import colorama
 from getch  import getch
